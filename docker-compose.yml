@@ -1,0 +1,35 @@
+version: '2.2'
+services:
+  php:
+    hostname: crguerrero
+    container_name: php56
+    image: blacknoob20/php5.6-fpm-alpine-oci8
+    cpuset: '0'
+    mem_limit: 64m
+    volumes:
+     - $PWD/:/var/www/html/
+     - $PWD/../tmp/:/tmp/
+     - $PWD/../php-5.6-fpm/opt/oracle/client/11.2/network/admin/:/opt/oracle/client/11.2/network/admin/
+     - $PWD/../php-5.6-fpm/var/log/sgpplus/:/var/log/sgpplus/
+    networks:
+      - net
+  sgp:
+    depends_on:
+      - php
+    container_name: php-excel
+    image: webdevops/apache:alpine-3
+    cpuset: '1'
+    mem_limit: 32m
+    environment:
+      - WEB_PHP_SOCKET=php:9000
+      - WEB_DOCUMENT_ROOT=/var/www/html/
+    volumes:
+      - $PWD/:/var/www/html
+      - $PWD/../apache2/var/log/apache2/:/var/log/apache2/
+    ports:
+      - '83:80'
+      - '4433:443'
+    networks:
+      - net
+networks:
+  net:
